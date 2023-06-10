@@ -261,6 +261,9 @@ M.enable_buf_win_reorder = function()
         end,
         group = group,
     })
+    vim.notify("Reorder on autocmd BufWinEnter enabled", "INFO", {
+        title = "LVIM TILING MANAGER",
+    })
 end
 
 M.disable_buf_win_reorder = function()
@@ -269,6 +272,9 @@ M.disable_buf_win_reorder = function()
     }
     utils.write_file(os.getenv("HOME") .. "/.local/share/nvim/.lvim_tm.json", _G.LVIM_TM)
     vim.api.nvim_del_augroup_by_name("LvimTilingManager")
+    vim.notify("Reorder on autocmd BufWinEnter disabled", "INFO", {
+        title = "LVIM TILING MANAGER",
+    })
 end
 
 return M
