@@ -239,26 +239,34 @@ end
 
 M.toggle_buf_win_reorder = function()
     if _G.LVIM_TM.buf_win_enter_reorder then
-        _G.LVIM_TM = {
-            buf_win_enter_reorder = false,
-        }
-        utils.write_file(os.getenv("HOME") .. "/.local/share/nvim/.lvim_tm.json", _G.LVIM_TM)
-        vim.api.nvim_del_augroup_by_name("LvimTilingManager")
+        M.disable_buf_win_reorder()
     else
-        _G.LVIM_TM = {
-            buf_win_enter_reorder = true,
-        }
-        utils.write_file(os.getenv("HOME") .. "/.local/share/nvim/.lvim_tm.json", _G.LVIM_TM)
-        local group = vim.api.nvim_create_augroup("LvimTilingManager", {
-            clear = true,
-        })
-        vim.api.nvim_create_autocmd("BufWinEnter", {
-            callback = function()
-                M.buf_win_enter()
-            end,
-            group = group,
-        })
+        M.enable_buf_win_reorder()
     end
+end
+
+M.enable_buf_win_reorder = function()
+    _G.LVIM_TM = {
+        buf_win_enter_reorder = true,
+    }
+    utils.write_file(os.getenv("HOME") .. "/.local/share/nvim/.lvim_tm.json", _G.LVIM_TM)
+    local group = vim.api.nvim_create_augroup("LvimTilingManager", {
+        clear = true,
+    })
+    vim.api.nvim_create_autocmd("BufWinEnter", {
+        callback = function()
+            M.buf_win_enter()
+        end,
+        group = group,
+    })
+end
+
+M.disable_buf_win_reorder = function()
+    _G.LVIM_TM = {
+        buf_win_enter_reorder = false,
+    }
+    utils.write_file(os.getenv("HOME") .. "/.local/share/nvim/.lvim_tm.json", _G.LVIM_TM)
+    vim.api.nvim_del_augroup_by_name("LvimTilingManager")
 end
 
 return M

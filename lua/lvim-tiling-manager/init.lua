@@ -57,6 +57,12 @@ M.commands = function()
     vim.api.nvim_create_user_command("LvimTMToggleBufWinReorder", function()
         fn.toggle_buf_win_reorder()
     end, {})
+    vim.api.nvim_create_user_command("LvimTMEnableBufWinReorder", function()
+        fn.enable_buf_win_reorder()
+    end, {})
+    vim.api.nvim_create_user_command("LvimTMDisableBufWinReorder", function()
+        fn.disable_buf_win_reorder()
+    end, {})
 end
 
 return M
