@@ -60,6 +60,49 @@ M.stack = function()
     end
 end
 
+M.reset = function()
+    local wins = M.get_wins()
+    if #wins == 1 then
+        return
+    end
+    local width = M.calculate_width()
+    if width > vim.o.columns then
+        width = M.default_master_pane_width()
+    end
+    if #wins <= 1 then
+        for i = 1, 1, -1 do
+            vim.api.nvim_set_current_win(wins[i])
+            M.wincmd("H")
+            if i ~= 1 then
+                vim.api.nvim_win_set_width(wins[i], width)
+            end
+            vim.api.nvim_win_set_option(wins[i], "winfixwidth", true)
+        end
+        return
+    end
+    for i = 1, 1, -1 do
+        vim.api.nvim_set_current_win(wins[i])
+        M.wincmd("H")
+    end
+    for _, w in ipairs(wins) do
+        vim.api.nvim_win_set_option(w, "winfixwidth", false)
+    end
+    for i = 1, 1 do
+        vim.api.nvim_win_set_width(wins[i], width)
+        vim.api.nvim_win_set_option(wins[i], "winfixwidth", true)
+    end
+end
+
+M.resize = function(diff)
+    local wins = M.get_wins()
+    local current = vim.api.nvim_get_current_win()
+    local size = vim.api.nvim_win_get_width(current)
+    local direction = wins[1] == current and 1 or -1
+    local width = size + diff * direction
+    vim.api.nvim_win_set_width(current, width)
+    config.master_pane_width = width
+end
+
 M.buf_win_enter = function()
     if #M.get_wins() == 1 then
         return
@@ -72,7 +115,6 @@ M.buf_win_enter = function()
             or utils.table_contains_value(config.black_bt, buftype)
         then
             return
-            -- vim.api.nvim_win_close(winnr, true)
         end
     end
     if vim.api.nvim_win_get_config(vim.api.nvim_get_current_win()).relative ~= "" then
@@ -81,7 +123,6 @@ M.buf_win_enter = function()
     M.wincmd("K")
     M.focus()
     M.focus()
-    M.wincmd("=")
 end
 
 M.focus = function()
@@ -116,10 +157,10 @@ M.focus = function()
     end
     M.wincmd("H")
     M.reset()
-    M.wincmd("=")
-    for bufnr in pairs(M.cursor) do
-        M.set_cursor_position(bufnr, M.cursor[bufnr].line, M.cursor[bufnr].col)
+    for key, value in pairs(M.cursor) do
+        M.set_cursor_position(key, value.line, value.col)
     end
+    vim.cmd("normal! zz")
 end
 
 M.rotate = function(left)
@@ -137,7 +178,7 @@ M.rotate = function(left)
             vim.api.nvim_win_close(winnr, true)
         else
             local line, col = M.get_cursor_position(winnr)
-            M.cursor[vim.api.nvim_win_get_buf(winnr)] = {
+            M.cursor[winnr] = {
                 line = line,
                 col = col,
             }
@@ -156,43 +197,10 @@ M.rotate = function(left)
         M.wincmd("K")
     end
     M.reset()
-    M.wincmd("=")
-    for bufnr in pairs(M.cursor) do
-        M.set_cursor_position(bufnr, M.cursor[bufnr].line, M.cursor[bufnr].col)
+    for key, value in pairs(M.cursor) do
+        M.set_cursor_position(key, value.line, value.col)
     end
-end
-
-M.reset = function()
-    local wins = M.get_wins()
-    if #wins == 1 then
-        return
-    end
-    local width = M.calculate_width()
-    if width > vim.o.columns then
-        width = M.default_master_pane_width()
-    end
-    if #wins <= 1 then
-        for i = 1, 1, -1 do
-            vim.api.nvim_set_current_win(wins[i])
-            M.wincmd("H")
-            if i ~= 1 then
-                vim.api.nvim_win_set_width(wins[i], width)
-            end
-            vim.api.nvim_win_set_option(wins[i], "winfixwidth", true)
-        end
-        return
-    end
-    for i = 1, 1, -1 do
-        vim.api.nvim_set_current_win(wins[i])
-        M.wincmd("H")
-    end
-    for _, w in ipairs(wins) do
-        vim.api.nvim_win_set_option(w, "winfixwidth", false)
-    end
-    for i = 1, 1 do
-        vim.api.nvim_win_set_width(wins[i], width)
-        vim.api.nvim_win_set_option(wins[i], "winfixwidth", true)
-    end
+    vim.cmd("normal! zz")
 end
 
 M.parse_percentage = function(v) -- luacheck: ignore 212
@@ -231,8 +239,7 @@ M.get_cursor_position = function(winnr)
     return line, col
 end
 
-M.set_cursor_position = function(bufnr, line, col)
-    local winnr = vim.fn.bufwinid(bufnr)
+M.set_cursor_position = function(winnr, line, col)
     vim.api.nvim_win_set_cursor(winnr, { line, col })
 end
 
