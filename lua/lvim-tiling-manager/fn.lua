@@ -148,6 +148,7 @@ M.focus = function()
     for key, value in pairs(M.cursor) do
         M.set_cursor_position(key, value.line, value.col)
     end
+    M.wincmd("=")
     vim.cmd("normal! zz")
 end
 
@@ -188,6 +189,7 @@ M.rotate = function(left)
     for key, value in pairs(M.cursor) do
         M.set_cursor_position(key, value.line, value.col)
     end
+    M.wincmd("=")
     vim.cmd("normal! zz")
 end
 
