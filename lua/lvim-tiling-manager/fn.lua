@@ -104,10 +104,10 @@ M.resize = function(diff)
 end
 
 M.buf_win_enter = function()
-    if #M.get_wins() == 1 then
+    local wins = M.get_wins()
+    if #wins == 1 then
         return
     end
-    local wins = M.get_wins()
     for _, winnr in ipairs(wins) do
         local filetype, buftype = utils.get_buffer_info_by_winnr(winnr)
         if
@@ -240,7 +240,9 @@ M.get_cursor_position = function(winnr)
 end
 
 M.set_cursor_position = function(winnr, line, col)
-    vim.api.nvim_win_set_cursor(winnr, { line, col })
+    if vim.api.nvim_win_is_valid(winnr) then
+        vim.api.nvim_win_set_cursor(winnr, { line, col })
+    end
 end
 
 M.wincmd = function(cmd)

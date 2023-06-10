@@ -19,9 +19,7 @@ M.commands = function()
     fn.reset()
     vim.api.nvim_create_autocmd("BufWinEnter", {
         callback = function()
-            vim.schedule(function()
-                fn.buf_win_enter()
-            end)
+            fn.buf_win_enter()
         end,
         group = group,
     })
