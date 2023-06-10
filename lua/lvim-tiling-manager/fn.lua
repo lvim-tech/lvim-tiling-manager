@@ -20,26 +20,13 @@ M.new = function()
 end
 
 M.close = function()
-    local wins = M.get_wins()
-    for _, winnr in ipairs(wins) do
-        local filetype, buftype = utils.get_buffer_info_by_winnr(winnr)
-        if
-            utils.table_contains_value(config.black_ft, vim.bo.filetype)
-            or utils.table_contains_value(config.black_bt, vim.bo.buftype)
-        then
-            vim.api.nvim_win_close(winnr, true)
-            M.stack()
-            M.reset()
-            return
-        elseif
-            utils.table_contains_value(config.black_ft, filetype)
-            or utils.table_contains_value(config.black_bt, buftype)
-        then
-            vim.api.nvim_win_close(winnr, true)
-        end
-    end
     local _, err = pcall(vim.api.nvim_win_close, 0, false)
     if err then
+        if err:match("E444") then
+            vim.notify("This is the last window")
+        else
+            error(err)
+        end
         return
     end
     if M.get_wins()[1] == vim.api.nvim_get_current_win() then
@@ -47,6 +34,7 @@ M.close = function()
         M.stack()
         M.reset()
     end
+    M.wincmd("=")
 end
 
 M.stack = function()
@@ -140,7 +128,7 @@ M.focus = function()
             vim.api.nvim_win_close(winnr, true)
         else
             local line, col = M.get_cursor_position(winnr)
-            M.cursor[vim.api.nvim_win_get_buf(winnr)] = {
+            M.cursor[winnr] = {
                 line = line,
                 col = col,
             }
