@@ -24,6 +24,14 @@ M.close = function()
     for _, winnr in ipairs(wins) do
         local filetype, buftype = utils.get_buffer_info_by_winnr(winnr)
         if
+            utils.table_contains_value(config.black_ft, vim.bo.filetype)
+            or utils.table_contains_value(config.black_bt, vim.bo.buftype)
+        then
+            vim.api.nvim_win_close(winnr, true)
+            M.stack()
+            M.reset()
+            return
+        elseif
             utils.table_contains_value(config.black_ft, filetype)
             or utils.table_contains_value(config.black_bt, buftype)
         then
