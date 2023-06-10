@@ -1,1 +1,1 @@
-# lvim-tiling-manager
+# LVIM TILING MANAGER
