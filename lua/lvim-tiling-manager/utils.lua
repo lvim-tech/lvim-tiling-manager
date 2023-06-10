@@ -48,4 +48,34 @@ M.get_buffer_info_by_winnr = function(winnr)
     return filetype, buftype
 end
 
+M.read_file = function(file)
+    local content
+    local file_content_ok, _ = pcall(function()
+        content = vim.fn.readfile(file)
+    end)
+    if not file_content_ok then
+        return nil
+    end
+    if type(content) == "table" then
+        return vim.fn.json_decode(content)
+    else
+        return nil
+    end
+end
+
+M.write_file = function(file, content)
+    local f = io.open(file, "w")
+    if f ~= nil then
+        if type(content) == "table" then
+            content = vim.fn.json_encode(content)
+        end
+        f:write(content)
+        f:close()
+    end
+end
+
+M.delete_file = function(f)
+    os.remove(f)
+end
+
 return M

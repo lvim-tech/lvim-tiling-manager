@@ -11,18 +11,28 @@ M.setup = function(user_config)
     if user_config ~= nil then
         utils.merge(config, user_config)
     end
+    local lvim_tm = utils.read_file(os.getenv("HOME") .. "/.local/share/nvim/.lvim_tm.json")
+    if lvim_tm ~= nil then
+        _G.LVIM_TM = lvim_tm
+    else
+        _G.LVIM_TM = {
+            buf_win_enter_reorder = true,
+        }
+    end
     M.commands()
 end
 
 M.commands = function()
     fn.stack()
     fn.reset()
-    vim.api.nvim_create_autocmd("BufWinEnter", {
-        callback = function()
-            fn.buf_win_enter()
-        end,
-        group = group,
-    })
+    if _G.LVIM_TM.buf_win_enter_reorder then
+        vim.api.nvim_create_autocmd("BufWinEnter", {
+            callback = function()
+                fn.buf_win_enter()
+            end,
+            group = group,
+        })
+    end
     vim.api.nvim_create_user_command("LvimTMRotate", function()
         fn.rotate()
     end, {})
@@ -43,6 +53,9 @@ M.commands = function()
     end, {})
     vim.api.nvim_create_user_command("LvimTMShrink", function()
         fn.resize(-1)
+    end, {})
+    vim.api.nvim_create_user_command("LvimTMToggleBufWinReorder", function()
+        fn.toggle_buf_win_reorder()
     end, {})
 end
 

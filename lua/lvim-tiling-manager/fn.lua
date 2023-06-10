@@ -237,4 +237,28 @@ M.wincmd = function(cmd)
     vim.cmd("wincmd " .. cmd)
 end
 
+M.toggle_buf_win_reorder = function()
+    if _G.LVIM_TM.buf_win_enter_reorder then
+        _G.LVIM_TM = {
+            buf_win_enter_reorder = false,
+        }
+        utils.write_file(os.getenv("HOME") .. "/.local/share/nvim/.lvim_tm.json", _G.LVIM_TM)
+        vim.api.nvim_del_augroup_by_name("LvimTilingManager")
+    else
+        _G.LVIM_TM = {
+            buf_win_enter_reorder = true,
+        }
+        utils.write_file(os.getenv("HOME") .. "/.local/share/nvim/.lvim_tm.json", _G.LVIM_TM)
+        local group = vim.api.nvim_create_augroup("LvimTilingManager", {
+            clear = true,
+        })
+        vim.api.nvim_create_autocmd("BufWinEnter", {
+            callback = function()
+                M.buf_win_enter()
+            end,
+            group = group,
+        })
+    end
+end
+
 return M
