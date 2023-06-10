@@ -49,16 +49,6 @@ M.close = function()
     end
 end
 
-M.resize = function(diff)
-    local wins = M.get_wins()
-    local current = vim.api.nvim_get_current_win()
-    local size = vim.api.nvim_win_get_width(current)
-    local direction = wins[1] == current and 1 or -1
-    local width = size + diff * direction
-    vim.api.nvim_win_set_width(current, width)
-    config.master_pane_width = width
-end
-
 M.stack = function()
     local wins = M.get_wins()
     if #wins == 1 then
