@@ -15,6 +15,8 @@ M.setup = function(user_config)
 end
 
 M.commands = function()
+    fn.stack()
+    fn.reset()
     vim.api.nvim_create_autocmd("BufWinEnter", {
         callback = function()
             fn.buf_win_enter()
